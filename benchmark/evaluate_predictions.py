@@ -131,7 +131,7 @@ def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts, save_path
 if __name__ == '__main__':
     img_dir = os.path.realpath(os.path.join(os.getcwd(), os.path.pardir, "data/GTSRB/Final_Test/Images/"))
     gt = load_ground_truth(os.path.join(img_dir, "GT-final_test.test.csv"))
-    predictions = load_predictions(r'R:\\projects\\smart-street-sign-detector\\output\\classical_pipeline\\00000.csv')
+    predictions = load_predictions(r'R:\\projects\\street-sign-detector\\output\\classical_pipeline\\00000.csv')
     metrics = evaluate_predictions(predictions, gt)
     print(metrics)
     visualize_prediction_vs_ground_truth(

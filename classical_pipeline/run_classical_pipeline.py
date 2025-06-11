@@ -33,8 +33,9 @@ def main(image_path, output_path=None, pred_csv_path=None):
     result = draw_boxes(image.copy(), candidates)
     if output_path:
         show(result)
-        cv2.imwrite(output_path, result)
-        print(f"Saved output image to: {output_path}")
+        output_img_path = os.path.join(output_path, os.path.basename(image_path).replace('.ppm', '.png'))
+        cv2.imwrite(output_img_path, result)
+        print(f"Saved output image to: {output_img_path}")
 
     if pred_csv_path:
         save_predictions(candidates, filename, pred_csv_path)
