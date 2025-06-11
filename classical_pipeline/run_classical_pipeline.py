@@ -16,17 +16,12 @@ def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2):
     return image
 
 
-def save_predictions_to_csv(predictions, image_filename, pred_csv_dir):
-    os.makedirs(pred_csv_dir, exist_ok=True)
-    csv_path = os.path.join(pred_csv_dir, "predictions.csv")
-    file_exists = os.path.isfile(csv_path)
-
-    with open(csv_path, mode='a', newline='') as csvfile:
+def save_predictions_to_csv(predictions, csv_path):
+    with open(csv_path, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        if not file_exists:
-            writer.writerow(['filename', 'x', 'y', 'w', 'h'])  # header
+        writer.writerow(['x', 'y', 'w', 'h'])  # CSV header (no filename needed per file)
         for (x, y, w, h) in predictions:
-            writer.writerow([image_filename, x, y, w, h])
+            writer.writerow([x, y, w, h])
 
 
 def main(image_path, pred_png_dir=None, pred_csv_dir=None, show_result=False):
@@ -50,6 +45,7 @@ def main(image_path, pred_png_dir=None, pred_csv_dir=None, show_result=False):
         show(image_with_boxes, title="Final Result")
 
     if pred_csv_dir:
+        os.makedirs(pred_csv_dir, exist_ok=True)
         output_filename = os.path.splitext(image_filename)[0] + ".csv"
         output_csv_path = os.path.join(pred_csv_dir, output_filename)
         save_predictions_to_csv(candidate_boxes, output_csv_path)

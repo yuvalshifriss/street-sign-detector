@@ -5,3 +5,7 @@
 __pycache__/
 **/__pycache__/
 *.py[cod]
+
+
+# Output predictions
+/output/classical_pipeline/pred_csv/*
