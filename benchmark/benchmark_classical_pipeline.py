@@ -1,13 +1,14 @@
 import os
 import subprocess
 import time
+import argparse
 from tqdm import tqdm
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-def main():
+def main(overwrite_predictions: bool):
     # === Start timer ===
     start_time = time.time()
 
@@ -29,12 +30,18 @@ def main():
         logging.error(f"No .ppm images found in {image_dir}")
         exit(1)
 
-    # === Run detection on all images ===
     logging.info(f"Processing {len(image_files)} test images...")
+
+    run_script = os.path.abspath(os.path.join(script_dir, "..", "classical_pipeline", "run_classical_pipeline.py"))
 
     for fname in tqdm(image_files, desc="Running classical pipeline"):
         image_path = os.path.join(image_dir, fname)
-        run_script = os.path.abspath(os.path.join(script_dir, "..", "classical_pipeline", "run_classical_pipeline.py"))
+        pred_csv_name = fname.replace(".ppm", ".csv")
+        pred_csv_path = os.path.join(output_csv_dir, pred_csv_name)
+
+        if not overwrite_predictions and os.path.exists(pred_csv_path):
+            logging.info(f"Skipping {fname} (prediction already exists).")
+            continue
 
         subprocess.run([
             "python",
@@ -61,4 +68,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--overwrite_predictions", action="store_true", help="If set, re-run predictions even if already exist")
+    args = parser.parse_args()
+
+    main(overwrite_predictions=args.overwrite_predictions)

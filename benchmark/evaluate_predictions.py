@@ -46,6 +46,12 @@ def load_predictions(pred_dir):
             continue
         fpath = os.path.join(pred_dir, fname)
         df = pd.read_csv(fpath)
+
+        # Skip files missing expected columns
+        if not set(['x', 'y', 'w', 'h']).issubset(df.columns):
+            print(f"[WARNING] Skipping {fname}: missing expected columns.")
+            continue
+
         base_img_name = fname.replace(".csv", ".ppm")
         boxes = [tuple(row) for row in df[['x', 'y', 'w', 'h']].to_numpy()]
         pred_dict[base_img_name] = boxes
