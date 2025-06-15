@@ -1,13 +1,17 @@
 import os
 import argparse
 import pandas as pd
+import torch
 import cv2
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import plotly.graph_objects as go
 import base64
 import numpy as np
-import cv2
+from torchvision import transforms
+from PIL import Image
+
+from nn_pipeline.simple_cnn import SimpleCNN
 
 
 def compute_iou(boxA, boxB):
@@ -47,7 +51,6 @@ def load_predictions(pred_dir):
         fpath = os.path.join(pred_dir, fname)
         df = pd.read_csv(fpath)
 
-        # Skip files missing expected columns
         if not set(['x', 'y', 'w', 'h']).issubset(df.columns):
             print(f"[WARNING] Skipping {fname}: missing expected columns.")
             continue
@@ -56,6 +59,36 @@ def load_predictions(pred_dir):
         boxes = [tuple(row) for row in df[['x', 'y', 'w', 'h']].to_numpy()]
         pred_dict[base_img_name] = boxes
     return pred_dict
+
+
+def predict_with_model(model_path, image_dir, threshold=0.5):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = SimpleCNN(num_classes=1).to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+
+    transform = transforms.Compose([
+        transforms.Resize((48, 48)),
+        transforms.ToTensor(),
+    ])
+
+    predictions = {}
+    for fname in tqdm(os.listdir(image_dir), desc="Predicting with model"):
+        if not fname.endswith(".ppm"):
+            continue
+        img_path = os.path.join(image_dir, fname)
+        image = Image.open(img_path).convert("RGB")
+        input_tensor = transform(image).unsqueeze(0).to(device)
+        with torch.no_grad():
+            output = model(input_tensor)
+            pred = (output > threshold).float().item()
+            if pred >= 1.0:
+                # Full image is treated as one bounding box
+                width, height = image.size
+                predictions[fname] = [(0, 0, width, height)]
+            else:
+                predictions[fname] = []
+    return predictions
 
 
 def evaluate_predictions(predictions, ground_truth, iou_threshold=0.5):
@@ -151,17 +184,35 @@ def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts):
     fig.show(renderer="browser")
 
 
-
-
 if __name__ == "__main__":
+    # run example 1:
+    # --pred_dir
+    # "R:\projects\street-sign-detector\output\classical_pipeline\pred_csv"
+    # --ground_truth
+    # "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\GT-final_test.test.csv"
+    # run example 2:
+    # --model "R:\projects\street-sign-detector\nn_pipeline\simple_cnn.pth"
+    # --image_dir "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images"
+    # --ground_truth "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\GT-final_test.test.csv"
     parser = argparse.ArgumentParser()
     parser.add_argument("--ground_truth", required=True, help="Path to GT-final_test.test.csv")
-    parser.add_argument("--pred_dir", required=True, help="Directory with per-image prediction CSVs")
-    parser.add_argument("--image_dir", help="Optional: Directory containing images for visualization")
+    parser.add_argument("--pred_dir", help="Directory with classical predictions (CSV format)")
+    parser.add_argument("--model", help="Path to trained PyTorch model (for NN evaluation)")
+    parser.add_argument("--image_dir", help="Optional: Directory containing images (required for model or visualization)")
     args = parser.parse_args()
 
+    # Load ground truth
     ground_truth = load_ground_truth(args.ground_truth)
-    predictions = load_predictions(args.pred_dir)
+
+    # Load predictions (either from CSV or NN model)
+    if args.model:
+        if not args.image_dir:
+            raise ValueError("`--image_dir` must be provided when using `--model` for inference.")
+        predictions = predict_with_model(args.model, args.image_dir)
+    elif args.pred_dir:
+        predictions = load_predictions(args.pred_dir)
+    else:
+        raise ValueError("Either --pred_dir or --model must be specified.")
 
     print(f"Loaded {len(predictions)} predictions and {len(ground_truth)} ground truth entries")
 
@@ -170,12 +221,15 @@ if __name__ == "__main__":
     for k, v in metrics.items():
         print(f"{k}: {v}")
 
-    metrics_path = os.path.join(args.pred_dir, "evaluation_metrics.csv")
-    pd.DataFrame([metrics]).to_csv(metrics_path, index=False)
-    print(f"\nSaved evaluation metrics to {metrics_path}")
+    # Save metrics if using CSV-based predictions
+    if args.pred_dir:
+        metrics_path = os.path.join(args.pred_dir, "evaluation_metrics.csv")
+        pd.DataFrame([metrics]).to_csv(metrics_path, index=False)
+        print(f"\nSaved evaluation metrics to {metrics_path}")
 
+    # Visualization (optional)
     if args.image_dir:
-        for fname in tqdm(ground_truth.keys(), desc="Visualizing"):
+        for fname in tqdm(list(ground_truth.keys())[:10], desc="Visualizing"):
             preds = predictions.get(fname, [])
             gts = ground_truth[fname]
             visualize_prediction_vs_ground_truth(args.image_dir, fname, preds, gts)
