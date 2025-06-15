@@ -24,14 +24,14 @@ def save_predictions_to_csv(predictions, csv_path):
             writer.writerow([x, y, w, h])
 
 
-def main(image_path, pred_png_dir=None, pred_csv_dir=None, show_result=False):
+def main(image_path, pred_png_dir=None, pred_csv_dir=None, show_result=False, min_area=300):
     image = cv2.imread(image_path)
     if image is None:
         logging.error(f"Failed to load image: {image_path}")
         return
 
     image_filename = os.path.basename(image_path)
-    candidate_boxes = get_candidate_regions(image, show_steps=show_result)
+    candidate_boxes = get_candidate_regions(image, show_steps=show_result, min_area=min_area)
     image_with_boxes = draw_boxes(image.copy(), candidate_boxes)
 
     if pred_png_dir:
@@ -58,11 +58,13 @@ if __name__ == "__main__":
     parser.add_argument("--pred_png_dir", help="Directory to save annotated PNG images (optional)")
     parser.add_argument("--pred_csv_dir", help="Directory to save combined predictions.csv (optional)")
     parser.add_argument("--show", action="store_true", help="Display debugging and final result images")
+    parser.add_argument("--min_area", type=int, default=300, help="Minimum area threshold for detected bounding boxes")
     args = parser.parse_args()
 
     main(
         image_path=args.image,
         pred_png_dir=args.pred_png_dir,
         pred_csv_dir=args.pred_csv_dir,
-        show_result=args.show
+        show_result=args.show,
+        min_area=args.min_area
     )

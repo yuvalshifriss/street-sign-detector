@@ -8,4 +8,4 @@ __pycache__/
 
 
 # Output predictions
-/output/classical_pipeline/pred_csv/*
+/output/classical_pipeline/*/*
