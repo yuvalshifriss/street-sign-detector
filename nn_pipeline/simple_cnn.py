@@ -27,8 +27,7 @@ class SimpleCNN(nn.Module):
             nn.Linear(64 * 6 * 6, 128),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(128, num_classes),
-            nn.Sigmoid()  # use `Sigmoid` for binary classification
+            nn.Linear(128, 4)  # Output: bounding box [x, y, w, h]
         )
 
     def forward(self, x):

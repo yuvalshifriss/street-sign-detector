@@ -26,12 +26,18 @@ class SignDataset(Dataset):
     def __getitem__(self, idx):
         row = self.df.iloc[idx]
         image = Image.open(row["image_path"]).convert("RGB")
-        label = 1.0  # Binary label for presence of sign
+
+        # Extract bounding box
+        x = row["Roi.X1"]
+        y = row["Roi.Y1"]
+        w = row["Roi.X2"] - row["Roi.X1"]
+        h = row["Roi.Y2"] - row["Roi.Y1"]
+        target = torch.tensor([x, y, w, h], dtype=torch.float32)
 
         if self.transform:
             image = self.transform(image)
 
-        return image, torch.tensor(label, dtype=torch.float32)
+        return image, target
 
 
 # ===== Utilities =====
@@ -54,7 +60,7 @@ def train(model, dataloader, criterion, optimizer, device):
     model.train()
     total_loss = 0.0
     for inputs, labels in tqdm(dataloader, desc="Training", leave=False):
-        inputs, labels = inputs.to(device), labels.to(device).unsqueeze(1)
+        inputs, labels = inputs.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
@@ -67,17 +73,14 @@ def train(model, dataloader, criterion, optimizer, device):
 def validate(model, dataloader, criterion, device):
     model.eval()
     total_loss = 0.0
-    correct = 0
     with torch.no_grad():
         for inputs, labels in tqdm(dataloader, desc="Validating", leave=False):
-            inputs, labels = inputs.to(device), labels.to(device).unsqueeze(1)
+            inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
-            preds = (outputs > 0.5).float()
-            correct += (preds == labels).sum().item()
             total_loss += loss.item() * inputs.size(0)
-    acc = correct / len(dataloader.dataset)
-    return total_loss / len(dataloader.dataset), acc
+    return total_loss / len(dataloader.dataset)
+
 
 
 # ===== Main =====
@@ -112,15 +115,15 @@ def main():
 
     # === Model setup ===
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleCNN(num_classes=1).to(device)
-    criterion = nn.BCELoss()
+    model = SimpleCNN(num_classes=4).to(device)
+    criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     for epoch in range(args.epochs):
         print(f"\nEpoch {epoch + 1}/{args.epochs}")
         train_loss = train(model, train_loader, criterion, optimizer, device)
-        val_loss, val_acc = validate(model, val_loader, criterion, device)
-        print(f"Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}")
+        val_loss = validate(model, val_loader, criterion, device)
+        print(f"Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
 
     torch.save(model.state_dict(), args.output_model)
     print(f"\n✅ Model saved to {args.output_model}")

@@ -61,9 +61,9 @@ def load_predictions(pred_dir):
     return pred_dict
 
 
-def predict_with_model(model_path, image_dir, threshold=0.5):
+def predict_with_model(model_path, image_dir):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleCNN(num_classes=1).to(device)
+    model = SimpleCNN(num_classes=4).to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
@@ -80,14 +80,11 @@ def predict_with_model(model_path, image_dir, threshold=0.5):
         image = Image.open(img_path).convert("RGB")
         input_tensor = transform(image).unsqueeze(0).to(device)
         with torch.no_grad():
-            output = model(input_tensor)
-            pred = (output > threshold).float().item()
-            if pred >= 1.0:
-                # Full image is treated as one bounding box
-                width, height = image.size
-                predictions[fname] = [(0, 0, width, height)]
-            else:
-                predictions[fname] = []
+            output = model(input_tensor).squeeze().cpu().numpy()
+            x, y, w, h = output
+            x, y = max(0, x), max(0, y)
+            w, h = max(1, w), max(1, h)
+            predictions[fname] = [(x, y, w, h)]
     return predictions
 
 
