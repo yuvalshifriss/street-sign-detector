@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
     # Visualization (optional)
     if args.image_dir:
-        for fname in tqdm(list(ground_truth.keys())[:10], desc="Visualizing"):
+        for fname in tqdm(list(ground_truth.keys())[:10], desc="Visualizing"): # TODO: remove
             preds = predictions.get(fname, [])
             gts = ground_truth[fname]
             visualize_prediction_vs_ground_truth(args.image_dir, fname, preds, gts, f'{args.pred_dir}_png')

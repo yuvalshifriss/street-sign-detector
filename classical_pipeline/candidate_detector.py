@@ -7,7 +7,7 @@ from .edge_and_contours import get_edges, find_contours
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-def get_candidate_regions(image_bgr, min_area=300, save_path=None):
+def get_candidate_regions(image_bgr, min_area=25, save_path=None):
     """
     Detect potential traffic sign regions based on color and shape.
     Returns a list of bounding boxes: (x, y, w, h)

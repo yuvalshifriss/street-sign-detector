@@ -5,11 +5,12 @@ import time
 import argparse
 import pandas as pd
 import logging
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from plotly.io import write_html
 from tqdm import tqdm
-from benchmark_classical_pipeline import (
-    get_image_files,
-    run_pipeline_for_image
-)
+
+from benchmark_classical_pipeline import get_image_files, run_pipeline_for_image
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -44,6 +45,38 @@ def run_benchmark_for_min_area(min_area, run_script, eval_script, image_dir, bas
     return df
 
 
+def visualize_results_plotly(df: pd.DataFrame, output_path: str):
+    fig = make_subplots(
+        rows=1, cols=3,
+        subplot_titles=("F1 Score vs min_area", "Precision vs min_area", "Recall vs min_area"),
+        horizontal_spacing=0.15
+    )
+    # Sort for consistent line plots
+    df_sorted = df.sort_values("min_area")
+    # F1
+    fig.add_trace(go.Scatter(
+        x=df_sorted["min_area"], y=df_sorted["f1"],
+        mode="lines+markers", name="F1 Score"
+    ), row=1, col=1)
+    # Precision
+    fig.add_trace(go.Scatter(
+        x=df_sorted["min_area"], y=df_sorted["precision"],
+        mode="lines+markers", name="Precision"
+    ), row=1, col=2)
+    # Recall
+    fig.add_trace(go.Scatter(
+        x=df_sorted["min_area"], y=df_sorted["recall"],
+        mode="lines+markers", name="Recall"
+    ), row=1, col=3)
+    fig.update_layout(
+        title_text="Evaluation Metrics vs min_area",
+        height=400, width=1000,
+        showlegend=False
+    )
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    write_html(fig, output_path)
+
+
 def main(overwrite_predictions: bool):
     start_time = time.time()
 
@@ -67,6 +100,7 @@ def main(overwrite_predictions: bool):
         result_path = os.path.join(project_root, "output", "classical_pipeline_different_min_area.csv")
         combined.to_csv(result_path, index=False)
         logging.info(f"Saved combined results to: {result_path}")
+        visualize_results_plotly(combined, os.path.join(project_root, "output", "classical_pipeline_different_min_area.html"))
 
     elapsed = time.time() - start_time
     logging.info(f"Benchmark completed in {elapsed:.2f} seconds.")
