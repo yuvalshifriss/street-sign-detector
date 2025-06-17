@@ -13,15 +13,16 @@ def get_image_files(image_dir):
     return [f for f in os.listdir(image_dir) if f.endswith(".ppm")]
 
 
-def run_pipeline_for_image(run_script, image_path, output_csv_dir, overwrite):
+def run_pipeline_for_image(run_script, image_path, output_csv_dir, overwrite, min_area=None):
     pred_csv_name = os.path.splitext(os.path.basename(image_path))[0] + ".csv"
     pred_csv_path = os.path.join(output_csv_dir, pred_csv_name)
 
     if not overwrite and os.path.exists(pred_csv_path):
         logging.info(f"Skipping {os.path.basename(image_path)} (prediction already exists).")
         return
-
     cmd = ["python", run_script, "--image", image_path, "--pred_csv_dir", output_csv_dir]
+    if min_area:
+        cmd = cmd + ["--min_area", str(min_area)]
 
 
     subprocess.run(cmd, check=True)
@@ -44,6 +45,7 @@ def run_single_benchmark(run_script, eval_script, image_dir, output_dir, ground_
     subprocess.run([
         "python", eval_script,
         "--ground_truth", ground_truth_csv,
+        "--image_dir", image_dir,
         "--pred_dir", output_dir
     ], check=True)
 

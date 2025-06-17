@@ -48,6 +48,7 @@ def run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_p
     subprocess.run([
         "python", eval_script,
         "--ground_truth", ground_truth_csv,
+        "--image_dir", image_dir,
         "--pred_dir", output_dir
     ], check=True)
 

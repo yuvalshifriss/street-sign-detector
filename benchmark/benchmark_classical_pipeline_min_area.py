@@ -24,11 +24,13 @@ def run_benchmark_for_min_area(min_area, run_script, eval_script, image_dir, bas
 
     for fname in tqdm(image_files, desc=f"min_area={min_area}"):
         image_path = os.path.join(image_dir, fname)
-        run_pipeline_for_image(run_script, image_path, output_dir, overwrite, ["--min_area", str(min_area)])
+        run_pipeline_for_image(run_script, image_path, output_dir, overwrite, min_area)
+
 
     subprocess.run([
         "python", eval_script,
         "--ground_truth", ground_truth_csv,
+        "--image_dir", image_dir,
         "--pred_dir", output_dir
     ], check=True)
 

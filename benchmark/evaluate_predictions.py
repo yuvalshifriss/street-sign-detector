@@ -119,7 +119,8 @@ def evaluate_predictions(predictions, ground_truth, iou_threshold=0.5):
     return dict(TP=TP, FP=FP, FN=FN, precision=precision, recall=recall, f1=f1)
 
 
-def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts):
+def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts, pred_png):
+    os.makedirs(pred_png, exist_ok=True)
     image_path = os.path.join(image_dir, fname)
     image = cv2.imread(image_path)
     if image is None:
@@ -129,6 +130,7 @@ def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts):
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     height, width, _ = image_rgb.shape
 
+    # Significantly increase figure size to accommodate both image and title
     fig = go.Figure()
 
     # Background image
@@ -169,24 +171,29 @@ def visualize_prediction_vs_ground_truth(image_dir, fname, preds, gts):
             showlegend=False
         ))
 
+    # Update layout with title and axes
     fig.update_layout(
-        title_text=fname,
+        title_text=f"{fname} - Predicted (green) vs. GT (red)",
         xaxis=dict(showgrid=False, zeroline=False),
         yaxis=dict(showgrid=False, zeroline=False, scaleanchor="x"),
-        width=width,
-        height=height,
-        margin=dict(l=0, r=0, t=30, b=0)
+        width=width + 300,  # Significantly increase width for title and image
+        height=height + 300,  # Significantly increase height for title and image
+        margin=dict(l=30, r=30, t=100, b=30),  # Increased top margin for more space
     )
+
     fig.update_yaxes(autorange="reversed")
-    fig.show(renderer="browser")
+
+    # Save the plot as an HTML file
+    fig.write_html(os.path.join(pred_png, fname.replace('.ppm', '.html')))
+
 
 
 if __name__ == "__main__":
     # run example 1:
     # --pred_dir
-    # "R:\projects\street-sign-detector\output\classical_pipeline\pred_csv"
-    # --ground_truth
-    # "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\GT-final_test.test.csv"
+    # "R:\projects\street-sign-detector\output\classical_pipeline\pred_csv" --ground_truth
+    # "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\GT-final_test.test.csv" --image_dir
+    # "R:\\projects\\street-sign-detector\\data\\GTSRB\\Final_Test\\Images"
     # run example 2:
     # --model "R:\projects\street-sign-detector\nn_pipeline\simple_cnn.pth"
     # --image_dir "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images"
@@ -229,4 +236,4 @@ if __name__ == "__main__":
         for fname in tqdm(list(ground_truth.keys())[:10], desc="Visualizing"):
             preds = predictions.get(fname, [])
             gts = ground_truth[fname]
-            visualize_prediction_vs_ground_truth(args.image_dir, fname, preds, gts)
+            visualize_prediction_vs_ground_truth(args.image_dir, fname, preds, gts, f'{args.pred_dir}_png')
