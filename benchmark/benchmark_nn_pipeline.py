@@ -1,4 +1,5 @@
-# benchmark_classical_pipeline.py
+# benchmark_nn_pipeline.py
+
 import os
 import subprocess
 import time
@@ -13,7 +14,7 @@ def get_image_files(image_dir):
     return [f for f in os.listdir(image_dir) if f.endswith(".ppm")]
 
 
-def run_pipeline_for_image(run_script, image_path, output_csv_dir, overwrite):
+def run_pipeline_for_image(run_script, image_path, output_csv_dir, model_path, overwrite):
     pred_csv_name = os.path.splitext(os.path.basename(image_path))[0] + ".csv"
     pred_csv_path = os.path.join(output_csv_dir, pred_csv_name)
 
@@ -21,13 +22,16 @@ def run_pipeline_for_image(run_script, image_path, output_csv_dir, overwrite):
         logging.info(f"Skipping {os.path.basename(image_path)} (prediction already exists).")
         return
 
-    cmd = ["python", run_script, "--image", image_path, "--pred_csv_dir", output_csv_dir]
-
-
+    cmd = [
+        "python", run_script,
+        "--image", image_path,
+        "--pred_csv_dir", output_csv_dir,
+        "--model", model_path
+    ]
     subprocess.run(cmd, check=True)
 
 
-def run_single_benchmark(run_script, eval_script, image_dir, output_dir, ground_truth_csv, overwrite):
+def run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_path, ground_truth_csv, overwrite):
     os.makedirs(output_dir, exist_ok=True)
 
     image_files = get_image_files(image_dir)
@@ -37,9 +41,9 @@ def run_single_benchmark(run_script, eval_script, image_dir, output_dir, ground_
 
     logging.info(f"Processing {len(image_files)} test images...")
 
-    for fname in tqdm(image_files, desc="Running classical pipeline"):
+    for fname in tqdm(image_files, desc="Running NN pipeline"):
         image_path = os.path.join(image_dir, fname)
-        run_pipeline_for_image(run_script, image_path, output_dir, overwrite)
+        run_pipeline_for_image(run_script, image_path, output_dir, model_path, overwrite)
 
     subprocess.run([
         "python", eval_script,
@@ -53,16 +57,17 @@ def main(overwrite_predictions: bool):
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.abspath(os.path.join(script_dir, ".."))
-    run_script = os.path.join(project_root, "classical_pipeline", "run_classical_pipeline.py")
+    run_script = os.path.join(project_root, "nn_pipeline", "run_nn_pipeline.py")
     eval_script = os.path.join(project_root, "benchmark", "evaluate_predictions.py")
+    model_path = os.path.join(project_root, "nn_pipeline", "simple_cnn.pth")
     image_dir = os.path.join(project_root, "data", "GTSRB", "Final_Test", "Images")
     ground_truth_csv = os.path.join(image_dir, "GT-final_test.test.csv")
-    output_dir = os.path.join(project_root, "output", "classical_pipeline", "pred_csv")
+    output_dir = os.path.join(project_root, "output", "nn_pipeline", "pred_csv")
 
-    run_single_benchmark(run_script, eval_script, image_dir, output_dir, ground_truth_csv, overwrite_predictions)
+    run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_path, ground_truth_csv, overwrite_predictions)
 
     elapsed = time.time() - start_time
-    logging.info(f"Classic benchmark completed in {elapsed:.2f} seconds.")
+    logging.info(f"NN Benchmark completed in {elapsed:.2f} seconds.")
 
 
 if __name__ == '__main__':
