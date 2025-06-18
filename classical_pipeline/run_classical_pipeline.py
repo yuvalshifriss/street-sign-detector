@@ -91,9 +91,9 @@ def main(image_path: str,
 if __name__ == "__main__":
     # run example:
     # python run_classical_pipeline.py \
-    # --image "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\00042.ppm" \
-    # --pred_png_dir "R:\projects\street-sign-detector\output\classical_pipeline\pred_png" \
-    # --pred_csv_dir "R:\projects\street-sign-detector\output\classical_pipeline\pred_csv" \
+    # --image "R:\projects\street-sign-detector\data\GTSRB\Final_Test\Images\00042.ppm"
+    # --pred_png_dir "R:\projects\street-sign-detector\output\classical_pipeline\pred_png"
+    # --pred_csv_dir "R:\projects\street-sign-detector\output\classical_pipeline\pred_csv"
     # --min_area 300
     parser = argparse.ArgumentParser(description="Detect street sign regions using a classical image processing pipeline.")
     parser.add_argument("--image", required=True, help="Path to the input image")
