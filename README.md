@@ -74,3 +74,31 @@ street-sign-detector/
 
 
 
+---
+
+## 🧪 Classical Pipeline
+
+### How it Works
+
+The classical pipeline performs detection in several steps:
+
+1. **Color filtering**: isolates red, blue, and white regions in the image (common street sign colors).
+2. **Edge detection**: applies Canny edge detection to extract boundaries.
+3. **Contour extraction**: finds contours and filters out small areas.
+4. **Bounding box estimation**: returns bounding boxes around candidate contours.
+
+### Parameter: `min_area`
+
+To reduce false positives from noise, a **minimum area threshold** is applied. 
+
+### How to Run
+
+To run the classical pipeline on a single image:
+
+```bash
+python classical_pipeline/run_classical_pipeline.py \
+  --image data/GTSRB/Final_Test/Images/00042.ppm \
+  --pred_png_dir output/classical_pipeline/pred_png \
+  --pred_csv_dir output/classical_pipeline/pred_csv \
+  --min_area 300
+
