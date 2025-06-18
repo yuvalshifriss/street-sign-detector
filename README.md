@@ -192,18 +192,24 @@ output/nn_pipeline/pred_csv/
 output/nn_pipeline/pred_csv_png/
 
 
-### 📈 Comparison of Pipelines
+### 📈 Comparison of Pipelines: Classical vs Neural Network Pipeline
 ```bash
 python benchmark/compare_nn_classical_pipeline.py
 ```
 Outputs:
 compare_pipelines.html: Interactive Plotly bar chart of metrics
 
-Metric	Classical	Neural Network
-TP	4901	3805
-FP	7423	1400
-FN	7729	8825
-Precision	0.398	0.731
-Recall	0.388	0.301
-F1	0.393	0.426
+![image](https://github.com/user-attachments/assets/8210f795-1064-49ef-b2fa-520bca62bfdf)
+
+You can view the full plot in [View the full plot](output/compare_pipelines.html)
+
+| Metric     | Classical | Neural Network |
+|------------|-----------|----------------|
+| TP         | 4901      | 3805           |
+| FP         | 7423      | 1400           |
+| FN         | 7729      | 8825           |
+| Precision  | 0.398     | 0.731          |
+| Recall     | 0.388     | 0.301          |
+| F1 Score   | 0.393     | 0.426          |
+
 
