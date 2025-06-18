@@ -151,3 +151,35 @@ Below is the result summary:
 
 You can view the full plot in [View the full plot](output/classical_pipeline_different_min_area.html)
 
+
+## 🧠 Neural Network Pipeline
+### How it works
+A small CNN model (SimpleCNN) is trained to directly regress the bounding box (x, y, w, h) for each image. Trained using MSE loss over the annotated GTSRB training data and evaluated against the Final Test set.
+
+### Train the Model
+```bash
+python nn_pipeline/train_and_validate.py 
+  --image_root data/GTSRB/Final_Training/Images 
+  --epochs 20 
+  --batch_size 64 
+  --lr 0.001 
+  --output_model nn_pipeline/simple_cnn.pth
+```
+Outputs:
+* simple_cnn.pth: the trained model
+* simple_cnn_losses.csv: loss log
+* simple_cnn_loss_plot.html: interactive loss visualization
+
+### Run on Single Image
+```bash
+python nn_pipeline/run_nn_pipeline.py 
+  --image data/GTSRB/Final_Test/Images/00042.ppm 
+  --model nn_pipeline/simple_cnn.pth 
+  --pred_png_dir output/nn_pipeline/pred_csv_png 
+  --pred_csv_dir output/nn_pipeline/pred_csv
+```
+
+Benchmark Entire Test Set
+```bash
+python benchmark/benchmark_nn_pipeline.py
+```
