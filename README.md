@@ -72,7 +72,24 @@ street-sign-detector/
                 │   └── GT-00000.csv
 ```
 
+# 🧰 Requirements
 
+Install dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+# 📊 Data Source
+
+The data used in this project comes from the [GTSRB – German Traffic Sign Recognition Benchmark](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign) hosted on Kaggle.
+
+This dataset contains thousands of labeled images of German traffic signs, divided into:
+
+- `Final_Training/Images/` – used to train the neural network model. Each class has its own subdirectory with images and a `GT-XXXX.csv` annotation file containing bounding boxes.
+- `Final_Test/Images/` – used for evaluating both the classical and neural network pipelines. Includes images and a ground truth CSV file `GT-final_test.test.csv` with bounding box annotations.
+
+All evaluations in this project are performed on the **Final Test set**, using **precision**, **recall**, and **F1 score**, computed via **IoU-based matching** between predicted and ground truth bounding boxes.
 
 ---
 
