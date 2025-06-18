@@ -210,8 +210,6 @@ python nn_pipeline/run_nn_pipeline.py
 
 ![nn](https://github.com/user-attachments/assets/db7fa194-2f62-45fe-944a-268cc514b030)
 
-Download the HTML plot from [here](nn_pipeline/simple_cnn_loss_plot.html)
-
 
 ### Benchmark Entire Test Set
 ```bash
