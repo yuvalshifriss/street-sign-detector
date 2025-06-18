@@ -123,10 +123,10 @@ python benchmark/benchmark_classical_pipeline.py
 This will evaluate the model predictions against ground truth annotations and compute metrics such as precision, recall, and F1 score.
 
 * The predictions are saved to CSV files in:
-output/nn_pipeline/pred_csv/
+output/classical_pipeline/pred_csv/
 
 * If image_dir is specified in run_single_benchmark() (commented out by default), annotated PNG images with bounding boxes will also be saved to:
-output/nn_pipeline/pred_csv_png/
+output/classical_pipeline/pred_csv_png/
 
 ### 🎯 Choosing the min_area Parameter
 To optimize the min_area threshold, we ran:
@@ -179,7 +179,15 @@ python nn_pipeline/run_nn_pipeline.py
   --pred_csv_dir output/nn_pipeline/pred_csv
 ```
 
-Benchmark Entire Test Set
+### Benchmark Entire Test Set
 ```bash
 python benchmark/benchmark_nn_pipeline.py
 ```
+This will evaluate the model predictions against ground truth annotations and compute metrics such as precision, recall, and F1 score.
+
+* The predictions are saved to CSV files in:
+output/nn_pipeline/pred_csv/
+
+* If image_dir is specified in run_single_benchmark() (commented out by default), annotated PNG images with bounding boxes will also be saved to:
+output/nn_pipeline/pred_csv_png/
+
