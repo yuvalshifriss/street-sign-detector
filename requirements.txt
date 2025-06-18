@@ -1,0 +1,18 @@
+# Core libraries
+numpy
+pandas
+tqdm
+opencv-python
+Pillow
+matplotlib
+scikit-learn
+
+# Torch and torchvision
+torch>=1.10
+torchvision
+
+# Plotly for visualization
+plotly
+
+# Optional (for CLI use and robustness)
+argparse
