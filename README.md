@@ -191,3 +191,19 @@ output/nn_pipeline/pred_csv/
 * If image_dir is specified in run_single_benchmark() (commented out by default), annotated PNG images with bounding boxes will also be saved to:
 output/nn_pipeline/pred_csv_png/
 
+
+### 📈 Comparison of Pipelines
+```bash
+python benchmark/compare_nn_classical_pipeline.py
+```
+Outputs:
+compare_pipelines.html: Interactive Plotly bar chart of metrics
+
+Metric	Classical	Neural Network
+TP	4901	3805
+FP	7423	1400
+FN	7729	8825
+Precision	0.398	0.731
+Recall	0.388	0.301
+F1	0.393	0.426
+
