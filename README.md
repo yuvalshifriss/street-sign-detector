@@ -197,7 +197,7 @@ Outputs:
 * simple_cnn_loss_plot.html: interactive loss visualization
 
 ![image](https://github.com/user-attachments/assets/8fca5f3a-ecfa-4843-96ae-a06afc24bcfd)
-
+Download the HTML plot from [here](nn_pipeline/simple_cnn_loss_plot.html)
 
 ### Run on Single Image
 ```bash
