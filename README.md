@@ -5,7 +5,7 @@ This project implements and compares two pipelines for detecting street signs in
 - ✅ A **Classical Computer Vision Pipeline** using OpenCV and color/edge-based techniques
 - 🧠 A **Neural Network (CNN) Pipeline** using PyTorch for direct bounding box regression
 
-It benchmarks both approaches on the GTSRB dataset, evaluating performance on the Final Test set using precision, recall, and F1 score, with IoU-based matching to determine true positives.
+It benchmarks both approaches on the [GTSRB dataset](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign), evaluating performance on the Final Test set using precision, recall, and F1 score, with IoU-based matching to determine true positives.
 
 ---
 
