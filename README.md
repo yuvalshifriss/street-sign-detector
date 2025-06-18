@@ -104,18 +104,50 @@ The classical pipeline performs detection in several steps:
 3. **Contour extraction**: finds contours and filters out small areas.
 4. **Bounding box estimation**: returns bounding boxes around candidate contours.
 
-### Parameter: `min_area`
-
-To reduce false positives from noise, a **minimum area threshold** is applied. 
-
-### How to Run
+### Run on Single Image
 
 To run the classical pipeline on a single image:
 
 ```bash
-python classical_pipeline/run_classical_pipeline.py \
-  --image data/GTSRB/Final_Test/Images/00042.ppm \
-  --pred_png_dir output/classical_pipeline/pred_png \
-  --pred_csv_dir output/classical_pipeline/pred_csv \
+python classical_pipeline/run_classical_pipeline.py 
+  --image data/GTSRB/Final_Test/Images/00042.ppm 
+  --pred_png_dir output/classical_pipeline/pred_png 
+  --pred_csv_dir output/classical_pipeline/pred_csv 
   --min_area 300
+```
+
+### Run on Full Test Set
+```bash
+python benchmark/benchmark_classical_pipeline.py
+```
+This will evaluate the model predictions against ground truth annotations and compute metrics such as precision, recall, and F1 score.
+
+* The predictions are saved to CSV files in:
+output/nn_pipeline/pred_csv/
+
+* If image_dir is specified in run_single_benchmark() (commented out by default), annotated PNG images with bounding boxes will also be saved to:
+output/nn_pipeline/pred_csv_png/
+
+### 🎯 Choosing the min_area Parameter
+To optimize the min_area threshold, we ran:
+```bash
+python benchmark/benchmark_classical_pipeline_min_area.py
+```
+
+This evaluated multiple min_area values (25, 50, 75, ..., 300).
+Below is the result summary:
+
+| min\_area | Precision | Recall    | F1 Score  |
+| --------- | --------- | --------- | --------- |
+| 300       | 0.702     | 0.138     | 0.231     |
+| 150       | 0.646     | 0.184     | 0.286     |
+| 100       | 0.596     | 0.207     | 0.308     |
+| 75        | 0.564     | 0.228     | 0.325     |
+| 50        | 0.506     | 0.273     | 0.355     |
+| **25**    | **0.398** | **0.388** | **0.393** |
+
+➡️ We chose min_area = 25 because it achieved the highest F1 score, offering the best trade-off between precision and recall.
+![image](https://github.com/user-attachments/assets/cd6e2391-bef3-4819-9619-948561ee72de)
+
+You can view the full plot in [View the full plot](output/classical_pipeline_different_min_area.html)
 
