@@ -115,6 +115,8 @@ python classical_pipeline/run_classical_pipeline.py
   --pred_csv_dir output/classical_pipeline/pred_csv 
   --min_area 300
 ```
+![image](https://github.com/user-attachments/assets/f9872c90-6db5-4d46-ab28-a275257cf6ba)
+You can view the full plot in [View the full plot](output/classical_pipeline/pred_csv_png/00000.html)
 
 ### Run on Full Test Set
 ```bash
@@ -178,6 +180,9 @@ python nn_pipeline/run_nn_pipeline.py
   --pred_png_dir output/nn_pipeline/pred_csv_png 
   --pred_csv_dir output/nn_pipeline/pred_csv
 ```
+
+![image](https://github.com/user-attachments/assets/b1a1959b-93ca-4b64-8830-fb52bae9fbe5)
+You can view the full plot in [View the full plot](output/nn_pipeline/pred_csv_png/00000.html)
 
 ### Benchmark Entire Test Set
 ```bash
