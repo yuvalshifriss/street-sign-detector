@@ -1,11 +1,13 @@
 # 🛑 Street Sign Detector
 
-This project implements and compares two pipelines for detecting street signs in images:
+This project implements and compares two pipelines for refining bounding boxes around traffic signs in images from the GTSRB dataset:
 
-- ✅ A **Classical Computer Vision Pipeline** using OpenCV and color/edge-based techniques
-- 🧠 A **Neural Network (CNN) Pipeline** using PyTorch for direct bounding box regression
+✅ A Classical Computer Vision Pipeline using OpenCV with color filtering and edge-based heuristics
+🧠 A Neural Network Pipeline using PyTorch to directly regress bounding box coordinates
 
-It benchmarks both approaches on the [GTSRB dataset](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign), evaluating performance on the Final Test set using precision, recall, and F1 score, with IoU-based matching to determine true positives.
+The GTSRB (German Traffic Sign Recognition Benchmark) [GTSRB dataset](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign) dataset consists of images that each contain exactly one traffic sign, along with ground-truth bounding boxes around those signs. The goal is not general object detection, but rather precisely estimating the location and size of the sign within the image.
+
+The two pipelines are evaluated on the Final Test set using precision, recall, and F1 score, with IoU-based matching to determine true positives.
 
 ---
 
