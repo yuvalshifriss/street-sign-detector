@@ -15,7 +15,16 @@ from nn_pipeline.simple_cnn import SimpleCNN
 
 def compute_iou(boxA: Tuple[float, float, float, float],
                 boxB: Tuple[float, float, float, float]) -> float:
-    """Compute Intersection over Union (IoU) between two bounding boxes."""
+    """
+    Compute the Intersection over Union (IoU) between two bounding boxes.
+
+    Args:
+        boxA: Bounding box A in format (x, y, w, h)
+        boxB: Bounding box B in format (x, y, w, h)
+
+    Returns:
+        IoU score between boxA and boxB (0.0 - 1.0)
+    """
     ax1, ay1, aw, ah = boxA
     ax2, ay2 = ax1 + aw, ay1 + ah
     bx1, by1, bw, bh = boxB
@@ -35,19 +44,37 @@ def compute_iou(boxA: Tuple[float, float, float, float],
 
 
 def load_ground_truth(csv_path: str) -> Dict[str, List[Tuple[int, int, int, int]]]:
-    """Load ground truth bounding boxes from CSV file."""
+    """
+    Load ground truth bounding boxes from a CSV file.
+
+    Args:
+        csv_path: Path to the GT CSV file (e.g., GT-final_test.test.csv)
+
+    Returns:
+        Dictionary mapping image filenames to lists of ground truth bounding boxes (x, y, w, h)
+    """
     df = pd.read_csv(csv_path, sep=';')
-    gt_dict = {}
+    gt_dict: Dict[str, List[Tuple[int, int, int, int]]] = {}
     for _, row in df.iterrows():
-        box = (row['Roi.X1'], row['Roi.Y1'], row['Roi.X2'] - row['Roi.X1'], row['Roi.Y2'] - row['Roi.Y1'])
+        box = (row['Roi.X1'], row['Roi.Y1'],
+               row['Roi.X2'] - row['Roi.X1'],
+               row['Roi.Y2'] - row['Roi.Y1'])
         fname = row['Filename']
         gt_dict.setdefault(fname, []).append(box)
     return gt_dict
 
 
 def load_predictions(pred_dir: str) -> Dict[str, List[Tuple[float, float, float, float]]]:
-    """Load predicted bounding boxes from directory of CSV files."""
-    pred_dict = {}
+    """
+    Load predicted bounding boxes from CSV files in a directory.
+
+    Args:
+        pred_dir: Directory containing CSV prediction files for each image.
+
+    Returns:
+        Dictionary mapping image filenames to lists of predicted bounding boxes (x, y, w, h)
+    """
+    pred_dict: Dict[str, List[Tuple[float, float, float, float]]] = {}
     for fname in os.listdir(pred_dir):
         if not fname.endswith(".csv"):
             continue
@@ -63,7 +90,16 @@ def load_predictions(pred_dir: str) -> Dict[str, List[Tuple[float, float, float,
 
 
 def predict_with_model(model_path: str, image_dir: str) -> Dict[str, List[Tuple[float, float, float, float]]]:
-    """Generate predictions from a trained model on a directory of images."""
+    """
+    Use a trained model to predict bounding boxes for all images in a directory.
+
+    Args:
+        model_path: Path to trained PyTorch model (.pth)
+        image_dir: Directory containing images (.ppm) to predict
+
+    Returns:
+        Dictionary mapping image filenames to lists of predicted bounding boxes
+    """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SimpleCNN(num_classes=4).to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
@@ -74,7 +110,7 @@ def predict_with_model(model_path: str, image_dir: str) -> Dict[str, List[Tuple[
         transforms.ToTensor(),
     ])
 
-    predictions = {}
+    predictions: Dict[str, List[Tuple[float, float, float, float]]] = {}
     for fname in tqdm(os.listdir(image_dir), desc="Predicting with model"):
         if not fname.endswith(".ppm"):
             continue
@@ -93,11 +129,23 @@ def predict_with_model(model_path: str, image_dir: str) -> Dict[str, List[Tuple[
 def evaluate_predictions(predictions: Dict[str, List[Tuple[float, float, float, float]]],
                          ground_truth: Dict[str, List[Tuple[int, int, int, int]]],
                          iou_threshold: float = 0.5) -> Dict[str, float]:
-    """Evaluate predictions using precision, recall, F1 score, and confusion metrics."""
+    """
+    Compare predictions with ground truth and compute evaluation metrics.
+
+    Args:
+        predictions: Dictionary of predicted bounding boxes per image
+        ground_truth: Dictionary of ground truth bounding boxes per image
+        iou_threshold: Minimum IoU for a prediction to be considered a true positive
+
+    Returns:
+        Dictionary with evaluation metrics: TP, FP, FN, precision, recall, f1
+    """
     TP, FP, FN = 0, 0, 0
+
     for fname, gt_boxes in ground_truth.items():
         pred_boxes = predictions.get(fname, [])
         matched_gt = set()
+
         for pred in pred_boxes:
             best_iou, best_idx = 0, -1
             for idx, gt in enumerate(gt_boxes):
@@ -112,12 +160,14 @@ def evaluate_predictions(predictions: Dict[str, List[Tuple[float, float, float, 
                 matched_gt.add(best_idx)
             else:
                 FP += 1
+
         FN += len(gt_boxes) - len(matched_gt)
 
-    precision = TP / (TP + FP) if TP + FP else 0
-    recall = TP / (TP + FN) if TP + FN else 0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0
-    return dict(TP=TP, FP=FP, FN=FN, precision=precision, recall=recall, f1=f1)
+    precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
+    recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+
+    return {"TP": TP, "FP": FP, "FN": FN, "precision": precision, "recall": recall, "f1": f1}
 
 
 def visualize_prediction_vs_ground_truth(image_dir: str,
@@ -125,7 +175,16 @@ def visualize_prediction_vs_ground_truth(image_dir: str,
                                          preds: List[Tuple[float, float, float, float]],
                                          gts: List[Tuple[int, int, int, int]],
                                          pred_png: str) -> None:
-    """Visualize predicted vs ground truth bounding boxes and save as HTML."""
+    """
+    Generate an HTML visualization of predicted vs ground truth bounding boxes for a single image.
+
+    Args:
+        image_dir: Directory containing the image file
+        fname: Filename of the image (.ppm)
+        preds: List of predicted bounding boxes [(x, y, w, h)]
+        gts: List of ground truth bounding boxes [(x, y, w, h)]
+        pred_png: Directory to save the HTML visualization
+    """
     os.makedirs(pred_png, exist_ok=True)
     image_path = os.path.join(image_dir, fname)
     image = cv2.imread(image_path)
@@ -149,11 +208,13 @@ def visualize_prediction_vs_ground_truth(image_dir: str,
         )
     )
 
+    # Draw ground truth boxes (red)
     for i, (x, y, w, h) in enumerate(gts):
         fig.add_shape(type="rect", x0=x, y0=height - y, x1=x + w, y1=height - (y + h),
                       line=dict(color="red"), name=f"GT {i}")
         fig.add_trace(go.Scatter(x=[x], y=[height - y], text=[f"GT {i}"], mode="text", showlegend=False))
 
+    # Draw predicted boxes (green)
     for i, (x, y, w, h) in enumerate(preds):
         fig.add_shape(type="rect", x0=x, y0=height - y, x1=x + w, y1=height - (y + h),
                       line=dict(color="lime"), name=f"PR {i}")

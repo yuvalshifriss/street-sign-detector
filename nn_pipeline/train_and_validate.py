@@ -1,20 +1,25 @@
 # nn_pipeline/train_and_validate.py
-
+# === Standard Library ===
 import os
 import argparse
+from typing import Callable
+
+# === Third-party Libraries ===
 import pandas as pd
 from tqdm import tqdm
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms
 from PIL import Image
 from sklearn.model_selection import train_test_split
-
-from simple_cnn import SimpleCNN
 import plotly.graph_objects as go
+
+# === PyTorch ===
+import torch
+import torch.nn as nn
+from torch.optim import Optimizer
+from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+
+# === Local Imports ===
+from simple_cnn import SimpleCNN
 
 
 class SignDataset(Dataset):
@@ -64,9 +69,29 @@ def load_all_training_annotations(training_root: str) -> pd.DataFrame:
     return pd.concat(all_rows, ignore_index=True)
 
 
-def train(model: nn.Module, dataloader: DataLoader, criterion, optimizer, device) -> float:
+def train(
+    model: nn.Module,
+    dataloader: DataLoader,
+    criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+    optimizer: Optimizer,
+    device: torch.device
+) -> float:
+    """
+    Trains the model for one epoch.
+
+    Args:
+        model (nn.Module): The PyTorch model to train.
+        dataloader (DataLoader): DataLoader providing the training data.
+        criterion (Callable): Loss function to optimize.
+        optimizer (Optimizer): Optimizer for updating model parameters.
+        device (torch.device): Device to run training on (CPU or CUDA).
+
+    Returns:
+        float: Average training loss over the dataset.
+    """
     model.train()
     total_loss = 0.0
+
     for inputs, labels in tqdm(dataloader, desc="Training", leave=False):
         inputs, labels = inputs.to(device), labels.to(device)
         optimizer.zero_grad()
@@ -75,22 +100,42 @@ def train(model: nn.Module, dataloader: DataLoader, criterion, optimizer, device
         loss.backward()
         optimizer.step()
         total_loss += loss.item() * inputs.size(0)
+
     return total_loss / len(dataloader.dataset)
 
 
-def validate(model: nn.Module, dataloader: DataLoader, criterion, device) -> float:
+def validate(
+    model: nn.Module,
+    dataloader: DataLoader,
+    criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+    device: torch.device
+) -> float:
+    """
+    Validates the model on the validation dataset.
+
+    Args:
+        model (nn.Module): The PyTorch model to evaluate.
+        dataloader (DataLoader): DataLoader providing the validation data.
+        criterion (Callable): Loss function used for evaluation.
+        device (torch.device): Device to run validation on (CPU or CUDA).
+
+    Returns:
+        float: Average validation loss over the dataset.
+    """
     model.eval()
     total_loss = 0.0
+
     with torch.no_grad():
         for inputs, labels in tqdm(dataloader, desc="Validating", leave=False):
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             total_loss += loss.item() * inputs.size(0)
+
     return total_loss / len(dataloader.dataset)
 
 
-def plot_losses(loss_log: list[dict], output_html_path: str) -> None:
+def plot_losses(loss_log: list[dict], output_html_path: str):
     """
     Save an interactive loss curve plot as HTML.
 
