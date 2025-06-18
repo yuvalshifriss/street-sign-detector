@@ -5,7 +5,7 @@ This project implements and compares two pipelines for refining bounding boxes a
 ✅ A Classical Computer Vision Pipeline using OpenCV with color filtering and edge-based heuristics
 🧠 A Neural Network Pipeline using PyTorch to directly regress bounding box coordinates
 
-The GTSRB (German Traffic Sign Recognition Benchmark) [GTSRB dataset](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign) dataset consists of images that each contain exactly one traffic sign, along with ground-truth bounding boxes around those signs. The goal is not general object detection, but rather precisely estimating the location and size of the sign within the image.
+The [GTSRB dataset](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign) (German Traffic Sign Recognition Benchmark) dataset consists of **images, each containing exactly one traffic sign, along with ground-truth bounding boxes around those signs**. The goal is not general object detection, but rather **precisely estimating the location and size of the sign within the image.**
 
 The two pipelines are evaluated on the Final Test set using precision, recall, and F1 score, with IoU-based matching to determine true positives.
 
