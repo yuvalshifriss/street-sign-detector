@@ -116,6 +116,7 @@ python classical_pipeline/run_classical_pipeline.py
   --min_area 300
 ```
 ![classical](https://github.com/user-attachments/assets/e34365be-a190-431d-abce-0ba042a162c8)
+
 You can view the full plot in [View the full plot](output/classical_pipeline/pred_csv_png/00000.html)
 
 ### Run on Full Test Set
@@ -182,6 +183,7 @@ python nn_pipeline/run_nn_pipeline.py
 ```
 
 ![nn](https://github.com/user-attachments/assets/db7fa194-2f62-45fe-944a-268cc514b030)
+
 You can view the full plot in [View the full plot](output/nn_pipeline/pred_csv_png/00000.html)
 
 ### Benchmark Entire Test Set
@@ -210,11 +212,10 @@ You can view the full plot in [View the full plot](output/compare_pipelines.html
 
 | Metric     | Classical | Neural Network |
 |------------|-----------|----------------|
-| TP         | 4901      | 3805           |
-| FP         | 7423      | 1400           |
-| FN         | 7729      | 8825           |
-| Precision  | 0.398     | 0.731          |
-| Recall     | 0.388     | 0.301          |
-| F1 Score   | 0.393     | 0.426          |
-
+| TP         | 1744      | 10079          |
+| FP         | 739       | 2551           |
+| FN         | 10886     | 2551           |
+| Precision  | 0.702     | 0.798          |
+| Recall     | 0.138     | 0.798          |
+| F1 Score   | 0.231     | 0.798          |
 
