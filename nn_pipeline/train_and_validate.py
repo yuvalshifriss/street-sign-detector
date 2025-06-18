@@ -1,6 +1,7 @@
 import os
 import argparse
 import pandas as pd
+import csv
 from tqdm import tqdm
 
 import torch
@@ -12,6 +13,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 
 from simple_cnn import SimpleCNN
+import plotly.graph_objects as go
 
 
 # ===== Dataset Class =====
@@ -82,6 +84,23 @@ def validate(model, dataloader, criterion, device):
     return total_loss / len(dataloader.dataset)
 
 
+def plot_losses(loss_log, output_html_path):
+    df = pd.DataFrame(loss_log)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df["epoch"], y=df["train_loss"], mode="lines+markers", name="Train Loss"))
+    fig.add_trace(go.Scatter(x=df["epoch"], y=df["val_loss"], mode="lines+markers", name="Validation Loss"))
+
+    fig.update_layout(
+        title="Training vs Validation Loss",
+        xaxis_title="Epoch",
+        yaxis_title="Loss",
+        template="plotly_white"
+    )
+
+    fig.write_html(output_html_path)
+    print(f"📊 Loss plot saved to: {output_html_path}")
+
 
 # ===== Main =====
 def main():
@@ -90,7 +109,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_root", default=train_img_root)
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--output_model", default="simple_cnn.pth")
@@ -119,14 +138,27 @@ def main():
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
+    loss_log = []
+
     for epoch in range(args.epochs):
         print(f"\nEpoch {epoch + 1}/{args.epochs}")
         train_loss = train(model, train_loader, criterion, optimizer, device)
         val_loss = validate(model, val_loader, criterion, device)
         print(f"Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
+        loss_log.append({"epoch": epoch + 1, "train_loss": train_loss, "val_loss": val_loss})
 
+    # Save model
     torch.save(model.state_dict(), args.output_model)
     print(f"\n✅ Model saved to {args.output_model}")
+
+    # Save loss log
+    loss_csv_path = os.path.splitext(args.output_model)[0] + "_losses.csv"
+    pd.DataFrame(loss_log).to_csv(loss_csv_path, index=False)
+    print(f"📈 Saved loss log to: {loss_csv_path}")
+
+    # Plot loss
+    loss_plot_path = os.path.splitext(args.output_model)[0] + "_loss_plot.html"
+    plot_losses(loss_log, loss_plot_path)
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ def save_predictions_to_csv(predictions, csv_path):
             writer.writerow([x, y, w, h])
 
 
-def main(image_path, pred_png_dir=None, pred_csv_dir=None, min_area=300):
+def main(image_path, pred_png_dir=None, pred_csv_dir=None, min_area=25):
     image = cv2.imread(image_path)
     if image is None:
         logging.error(f"Failed to load image: {image_path}")
