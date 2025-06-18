@@ -161,26 +161,29 @@ Download the HTML plot from [here](output/classical_pipeline_different_min_area.
 A small CNN model is trained to directly regress the bounding box (x, y, w, h) for each image. Trained using MSE loss over the annotated GTSRB training data and evaluated against the Final Test set.
 
 ### Architecture  
-| Layer (type) | Output Shape     | Param # |
-|--------------|------------------|---------|
-| Conv2d-1     | [-1, 16, 48, 48] | 1,216   |
-| ReLU-2       | [-1, 16, 48, 48] | 0       |
-| MaxPool2d-3  | [-1, 16, 24, 24] | 0       |
-| Conv2d-4     | [-1, 32, 24, 24] | 4,640   |
-| ReLU-5       | [-1, 32, 24, 24] | 0       |
-| MaxPool2d-6  | [-1, 32, 12, 12] | 0       |
-| Conv2d-7     | [-1, 64, 12, 12] | 18,496  |
-| ReLU-8       | [-1, 64, 12, 12] | 0       |
-| MaxPool2d-9  | [-1, 64, 6, 6]   | 0       |
-| Flatten-10   | [-1, 2304]       | 0       |
-| Linear-11    | [-1, 128]        | 295,040 |
-| ReLU-12      | [-1, 128]        | 0       |
-| Dropout-13   | [-1, 128]        | 0       |
-| Linear-14    | [-1, 4]          | 516     |
-| **Total**    |                  | **319,908** |
+### 🧠 SimpleCNN Architecture
 
-Trainable params: 319,908
-Non-trainable params: 0
+| Layer        | Output Shape        | Kernel | Parameters |
+|--------------|---------------------|--------|------------|
+| Conv2d-1     | [-1, 16, 48, 48]    | 5×5    | 1,216      |
+| ReLU-2       | [-1, 16, 48, 48]    | –      | 0          |
+| MaxPool2d-3  | [-1, 16, 24, 24]    | 2×2    | 0          |
+| Conv2d-4     | [-1, 32, 24, 24]    | 3×3    | 4,640      |
+| ReLU-5       | [-1, 32, 24, 24]    | –      | 0          |
+| MaxPool2d-6  | [-1, 32, 12, 12]    | 2×2    | 0          |
+| Conv2d-7     | [-1, 64, 12, 12]    | 3×3    | 18,496     |
+| ReLU-8       | [-1, 64, 12, 12]    | –      | 0          |
+| MaxPool2d-9  | [-1, 64, 6, 6]      | 2×2    | 0          |
+| Flatten-10   | [-1, 2304]          | –      | 0          |
+| Linear-11    | [-1, 128]           | –      | 295,040    |
+| ReLU-12      | [-1, 128]           | –      | 0          |
+| Dropout-13   | [-1, 128]           | –      | 0          |
+| Linear-14    | [-1, 4]             | –      | 516        |
+
+**Total Parameters**: 319,908  
+**Trainable Parameters**: 319,908  
+**Non-trainable Parameters**: 0
+
 
 ### Train the Model
 ```bash
