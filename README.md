@@ -219,3 +219,14 @@ You can view the full plot in [View the full plot](output/compare_pipelines.html
 | Recall     | 0.138     | 0.798          |
 | F1 Score   | 0.231     | 0.798          |
 
+The results show a stark contrast between the classical and neural network pipelines:
+
+* Precision: Both methods achieve high precision, but the neural network slightly outperforms with 0.798 vs 0.702. This means that when either method predicts a sign, it is often correct—but the neural network is even more reliable in this regard.
+
+* Recall: This is where the classical pipeline falls short. With a recall of only 0.138, it misses most of the actual traffic signs, whereas the neural network captures nearly all of them (recall = 0.798).
+
+* F1 Score: As a harmonic mean of precision and recall, the F1 score summarizes the overall effectiveness. The neural network achieves a very strong F1 score of 0.798, compared to only 0.231 for the classical method.
+
+Conclusion:
+While the classical approach is conservative and relatively precise, it misses a vast majority of signs. The neural network is both precise and highly comprehensive in detection, making it the clearly superior option for traffic sign detection in this project.
+
