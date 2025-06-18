@@ -117,7 +117,6 @@ python classical_pipeline/run_classical_pipeline.py
 ```
 ![classical](https://github.com/user-attachments/assets/e34365be-a190-431d-abce-0ba042a162c8)
 
-You can view the full plot in [View the full plot](output/classical_pipeline/pred_csv_png/00000.html)
 
 ### Run on Full Test Set
 ```bash
@@ -184,7 +183,6 @@ python nn_pipeline/run_nn_pipeline.py
 
 ![nn](https://github.com/user-attachments/assets/db7fa194-2f62-45fe-944a-268cc514b030)
 
-You can view the full plot in [View the full plot](output/nn_pipeline/pred_csv_png/00000.html)
 
 ### Benchmark Entire Test Set
 ```bash
