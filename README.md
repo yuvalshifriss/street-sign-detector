@@ -154,32 +154,31 @@ Below is the result summary:
 ➡️ We chose min_area = 25 because it achieved the highest F1 score, offering the best trade-off between precision and recall.
 ![image](https://github.com/user-attachments/assets/cd6e2391-bef3-4819-9619-948561ee72de)
 
-Download the HTML plot from [View the full plot](output/classical_pipeline_different_min_area.html)
+Download the HTML plot from [here](output/classical_pipeline_different_min_area.html)
 
 ## 🧠 Neural Network Pipeline
 ### How it works
 A small CNN model is trained to directly regress the bounding box (x, y, w, h) for each image. Trained using MSE loss over the annotated GTSRB training data and evaluated against the Final Test set.
 
 ### Architecture  
-==============================================================================
-Layer (type)              Output Shape              Param #
-==============================================================================
-Conv2d-1                  [-1, 16, 48, 48]          1,216
-ReLU-2                    [-1, 16, 48, 48]          0
-MaxPool2d-3               [-1, 16, 24, 24]          0
-Conv2d-4                  [-1, 32, 24, 24]          4,640
-ReLU-5                    [-1, 32, 24, 24]          0
-MaxPool2d-6               [-1, 32, 12, 12]          0
-Conv2d-7                  [-1, 64, 12, 12]          18,496
-ReLU-8                    [-1, 64, 12, 12]          0
-MaxPool2d-9               [-1, 64, 6, 6]            0
-Flatten-10                [-1, 2304]                0
-Linear-11                 [-1, 128]                 295,040
-ReLU-12                   [-1, 128]                 0
-Dropout-13                [-1, 128]                 0
-Linear-14                 [-1, 4]                   516
-==============================================================================
-Total params: 319,908
+| Layer (type) | Output Shape     | Param # |
+|--------------|------------------|---------|
+| Conv2d-1     | [-1, 16, 48, 48] | 1,216   |
+| ReLU-2       | [-1, 16, 48, 48] | 0       |
+| MaxPool2d-3  | [-1, 16, 24, 24] | 0       |
+| Conv2d-4     | [-1, 32, 24, 24] | 4,640   |
+| ReLU-5       | [-1, 32, 24, 24] | 0       |
+| MaxPool2d-6  | [-1, 32, 12, 12] | 0       |
+| Conv2d-7     | [-1, 64, 12, 12] | 18,496  |
+| ReLU-8       | [-1, 64, 12, 12] | 0       |
+| MaxPool2d-9  | [-1, 64, 6, 6]   | 0       |
+| Flatten-10   | [-1, 2304]       | 0       |
+| Linear-11    | [-1, 128]        | 295,040 |
+| ReLU-12      | [-1, 128]        | 0       |
+| Dropout-13   | [-1, 128]        | 0       |
+| Linear-14    | [-1, 4]          | 516     |
+| **Total**    |                  | **319,908** |
+
 Trainable params: 319,908
 Non-trainable params: 0
 
@@ -210,7 +209,8 @@ python nn_pipeline/run_nn_pipeline.py
 ```
 
 ![nn](https://github.com/user-attachments/assets/db7fa194-2f62-45fe-944a-268cc514b030)
-Download the HTML plot from [View the full plot](nn_pipeline/simple_cnn_loss_plot.html)
+
+Download the HTML plot from [here](nn_pipeline/simple_cnn_loss_plot.html)
 
 
 ### Benchmark Entire Test Set
@@ -235,7 +235,7 @@ compare_pipelines.html: Interactive Plotly bar chart of metrics
 
 ![image](https://github.com/user-attachments/assets/8210f795-1064-49ef-b2fa-520bca62bfdf)
 
-Download the HTML plot from [View the full plot](output/compare_pipelines.html)
+Download the HTML plot from [here](output/compare_pipelines.html)
 
 | Metric     | Classical | Neural Network |
 |------------|-----------|----------------|
