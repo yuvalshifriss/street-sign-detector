@@ -6,15 +6,41 @@ import time
 import argparse
 from tqdm import tqdm
 import logging
+from typing import List
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-def get_image_files(image_dir):
+def get_image_files(image_dir: str) -> List[str]:
+    """
+    Returns a list of all .ppm image files in a directory.
+
+    Args:
+        image_dir: Directory containing image files.
+
+    Returns:
+        List of filenames ending with '.ppm'.
+    """
     return [f for f in os.listdir(image_dir) if f.endswith(".ppm")]
 
 
-def run_pipeline_for_image(run_script, image_path, output_csv_dir, model_path, overwrite):
+def run_pipeline_for_image(
+    run_script: str,
+    image_path: str,
+    output_csv_dir: str,
+    model_path: str,
+    overwrite: bool
+) -> None:
+    """
+    Runs the NN detection pipeline on a single image.
+
+    Args:
+        run_script: Path to run_nn_pipeline.py.
+        image_path: Path to the input image.
+        output_csv_dir: Directory where prediction CSVs will be saved.
+        model_path: Path to the trained NN model file (.pth).
+        overwrite: Whether to overwrite existing predictions.
+    """
     pred_csv_name = os.path.splitext(os.path.basename(image_path))[0] + ".csv"
     pred_csv_path = os.path.join(output_csv_dir, pred_csv_name)
 
@@ -31,7 +57,27 @@ def run_pipeline_for_image(run_script, image_path, output_csv_dir, model_path, o
     subprocess.run(cmd, check=True)
 
 
-def run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_path, ground_truth_csv, overwrite):
+def run_single_benchmark(
+    run_script: str,
+    eval_script: str,
+    image_dir: str,
+    output_dir: str,
+    model_path: str,
+    ground_truth_csv: str,
+    overwrite: bool
+) -> None:
+    """
+    Runs the full benchmark of the NN pipeline on all test images and evaluates results.
+
+    Args:
+        run_script: Path to the NN pipeline script.
+        eval_script: Path to the evaluation script.
+        image_dir: Directory of test images.
+        output_dir: Directory where prediction CSVs will be saved.
+        model_path: Path to the trained NN model file.
+        ground_truth_csv: Path to ground truth CSV file.
+        overwrite: Whether to overwrite existing predictions.
+    """
     os.makedirs(output_dir, exist_ok=True)
 
     image_files = get_image_files(image_dir)
@@ -53,7 +99,13 @@ def run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_p
     ], check=True)
 
 
-def main(overwrite_predictions: bool):
+def main(overwrite_predictions: bool) -> None:
+    """
+    Sets up and executes the neural network pipeline benchmark process.
+
+    Args:
+        overwrite_predictions: Whether to re-run predictions even if they exist.
+    """
     start_time = time.time()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,7 +117,15 @@ def main(overwrite_predictions: bool):
     ground_truth_csv = os.path.join(image_dir, "GT-final_test.test.csv")
     output_dir = os.path.join(project_root, "output", "nn_pipeline", "pred_csv")
 
-    run_single_benchmark(run_script, eval_script, image_dir, output_dir, model_path, ground_truth_csv, overwrite_predictions)
+    run_single_benchmark(
+        run_script=run_script,
+        eval_script=eval_script,
+        image_dir=image_dir,
+        output_dir=output_dir,
+        model_path=model_path,
+        ground_truth_csv=ground_truth_csv,
+        overwrite=overwrite_predictions
+    )
 
     elapsed = time.time() - start_time
     logging.info(f"NN Benchmark completed in {elapsed:.2f} seconds.")

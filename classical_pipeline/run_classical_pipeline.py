@@ -3,21 +3,41 @@ import cv2
 import os
 import csv
 import logging
+from typing import List, Tuple, Optional
 
 from classical_pipeline.candidate_detector import get_candidate_regions
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2):
+def draw_boxes(image: 'np.ndarray', boxes: List[Tuple[int, int, int, int]],
+               color: Tuple[int, int, int] = (0, 255, 0), thickness: int = 2) -> 'np.ndarray':
+    """
+    Draws bounding boxes on an image.
+
+    Args:
+        image: The input image as a NumPy array.
+        boxes: List of bounding boxes in (x, y, w, h) format.
+        color: RGB color for the box outlines.
+        thickness: Thickness of the rectangle lines.
+
+    Returns:
+        Annotated image with rectangles drawn.
+    """
     for (x, y, w, h) in boxes:
         x, y, w, h = int(x), int(y), int(w), int(h)
         cv2.rectangle(image, (x, y), (x + w, y + h), color, thickness)
     return image
 
 
+def save_predictions_to_csv(predictions: List[Tuple[int, int, int, int]], csv_path: str) -> None:
+    """
+    Saves bounding box predictions to a CSV file.
 
-def save_predictions_to_csv(predictions, csv_path):
+    Args:
+        predictions: List of bounding boxes in (x, y, w, h) format.
+        csv_path: File path where predictions will be saved.
+    """
     with open(csv_path, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['x', 'y', 'w', 'h'])
@@ -25,7 +45,19 @@ def save_predictions_to_csv(predictions, csv_path):
             writer.writerow([x, y, w, h])
 
 
-def main(image_path, pred_png_dir=None, pred_csv_dir=None, min_area=25):
+def main(image_path: str,
+         pred_png_dir: Optional[str] = None,
+         pred_csv_dir: Optional[str] = None,
+         min_area: int = 25) -> None:
+    """
+    Main entry point to process an image using the classical detection pipeline.
+
+    Args:
+        image_path: Path to the input image (.ppm format expected).
+        pred_png_dir: Directory to save annotated images (optional).
+        pred_csv_dir: Directory to save prediction CSV files (optional).
+        min_area: Minimum area threshold to filter out small detections.
+    """
     image = cv2.imread(image_path)
     if image is None:
         logging.error(f"Failed to load image: {image_path}")
@@ -34,7 +66,8 @@ def main(image_path, pred_png_dir=None, pred_csv_dir=None, min_area=25):
     image_filename = os.path.basename(image_path)
     cur_save_path = None
     if pred_png_dir:
-        cur_save_path = os.path.join(pred_png_dir, os.path.basename(image_path).replace('ppm', 'png'))
+        cur_save_path = os.path.join(pred_png_dir, image_filename.replace('ppm', 'png'))
+
     candidate_boxes = get_candidate_regions(image, save_path=cur_save_path, min_area=min_area)
 
     # Save annotated image if requested
