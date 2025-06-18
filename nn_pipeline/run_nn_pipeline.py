@@ -92,7 +92,7 @@ def main(image_path: str,
         return
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleCNN(num_classes=4).to(device)
+    model = SimpleCNN(num_outputs=4).to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
