@@ -248,11 +248,19 @@ Download the HTML plot from [here](output/compare_pipelines.html)
 
 The results show a stark contrast between the classical and neural network pipelines:
 
-* Precision: Both methods achieve high precision, but the neural network slightly outperforms with 0.798 vs 0.702. This means that when either method predicts a sign, it is often correct—but the neural network is even more reliable in this regard.
+* Precision: Both methods achieve high precision, but the neural network slightly outperforms with 0.862 vs 0.702. This means that when either method predicts a sign, it is often correct—but the neural network is even more reliable in this regard.
 
-* Recall: This is where the classical pipeline falls short. With a recall of only 0.138, it misses most of the actual traffic signs, whereas the neural network captures nearly all of them (recall = 0.798).
+* Recall: This is where the classical pipeline falls short. With a recall of only 0.138, it misses most of the actual traffic signs, whereas the neural network captures nearly all of them (recall = 0.862).
 
-* F1 Score: As a harmonic mean of precision and recall, the F1 score summarizes the overall effectiveness. The neural network achieves a very strong F1 score of 0.798, compared to only 0.231 for the classical method.
+* F1 Score: As a harmonic mean of precision and recall, the F1 score summarizes the overall effectiveness. The neural network achieves a very strong F1 score of 0.862, compared to only 0.231 for the classical method.
+
+Also note that the neural network always outputs exactly one prediction per image, and since each test image contains exactly one ground truth box, the evaluation reduces to a simple case:
+* If the predicted box has IoU ≥ threshold, it's a true positive.
+* If not, it's counted as both a false positive and a false negative (If the predicted box does not sufficiently match the ground truth, it is counted as both a false positive (an incorrect prediction was made) and a false negative (the true object was missed).
+This results in FP = FN, and therefore: 
+Precision = Recall
+F1 Score = Precision = Recall
+This is not a bug — it's a natural consequence of the prediction strategy (one box per image) and the evaluation metric (IoU-based matching).
 
 Conclusion:
 While the classical approach is conservative and relatively precise, it misses a vast majority of signs. The neural network is both precise and highly comprehensive in detection, making it the clearly superior option for traffic sign detection in this project.
