@@ -257,6 +257,7 @@ The results show a stark contrast between the classical and neural network pipel
 Also note that the neural network always outputs exactly one prediction per image, and since each test image contains exactly one ground truth box, the evaluation reduces to a simple case:
 * If the predicted box has IoU ≥ threshold, it's a true positive.
 * If not, it's counted as both a false positive and a false negative (If the predicted box does not sufficiently match the ground truth, it is counted as both a false positive (an incorrect prediction was made) and a false negative (the true object was missed).
+
 This results in FP = FN, and therefore F1 Score = Precision = Recall.
 This is not a bug — it's a natural consequence of the prediction strategy (one box per image) and the evaluation metric (IoU-based matching).
 
