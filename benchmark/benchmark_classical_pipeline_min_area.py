@@ -56,7 +56,7 @@ def run_benchmark_for_min_area(
     subprocess.run([
         "python", eval_script,
         "--ground_truth", ground_truth_csv,
-        "--image_dir", image_dir,
+        # "--image_dir", image_dir,
         "--pred_dir", output_dir
     ], check=True)
 
