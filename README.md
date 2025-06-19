@@ -233,19 +233,18 @@ python benchmark/compare_nn_classical_pipeline.py
 ```
 Outputs:
 compare_pipelines.html: Interactive Plotly bar chart of metrics
-
-![image](https://github.com/user-attachments/assets/8210f795-1064-49ef-b2fa-520bca62bfdf)
+![dddd](https://github.com/user-attachments/assets/c112cbe4-9aad-4706-9bf8-a1f004ab409d)
 
 Download the HTML plot from [here](output/compare_pipelines.html)
 
 | Metric     | Classical | Neural Network |
 |------------|-----------|----------------|
-| TP         | 1744      | 10079          |
-| FP         | 739       | 2551           |
-| FN         | 10886     | 2551           |
-| Precision  | 0.702     | 0.798          |
-| Recall     | 0.138     | 0.798          |
-| F1 Score   | 0.231     | 0.798          |
+| TP         | 1744      | 10895          |
+| FP         | 739       | 1735           |
+| FN         | 10886     | 1735           |
+| Precision  | 0.702     | 0.862          |
+| Recall     | 0.138     | 0.862          |
+| F1 Score   | 0.231     | 0.862          |
 
 The results show a stark contrast between the classical and neural network pipelines:
 
